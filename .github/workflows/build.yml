@@ -19,7 +19,7 @@ jobs:
       - name: Read VERSION from config.sh
         id: version
         run: |
-          VERSION=$(grep VERSION config.sh | cut -d'=' -f2)
+          VERSION=$(grep VERSION config.sh | cut -d'=' -f2 | tr -d '"')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Build
