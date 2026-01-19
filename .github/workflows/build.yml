@@ -4,35 +4,45 @@ on:
   push:
     branches: [ "main" ]
 
-
 permissions:
-  contents: write   # ⚠️ 这行必须加，保证 GITHUB_TOKEN 可以创建 release
+  contents: write
 
 jobs:
   build-release:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set execute permission for build script
+      - name: Set execute permission for build
         run: chmod +x build.sh
 
-      - name: Run build
+      - name: Read VERSION from config.sh
+        id: version
+        run: |
+          VERSION=$(grep VERSION config.sh | cut -d'=' -f2)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Build
         run: ./build.sh
 
+      - name: Create Git tag
+        run: |
+          git config user.name "xlaoyu"
+          git config user.email "frank_yll@163.com"
+          git tag -f $VERSION
+          git push origin $VERSION --force
+
       - name: Create Release
-        id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ github.run_number }}
-          name: "env-init v${{ github.run_number }}"
+          tag_name: ${{ env.VERSION }}
+          name: "env-init ${{ env.VERSION }}"
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload dist files to Release
+      - name: Upload dist files
         uses: softprops/action-gh-release@v1
         with:
           files: dist/env-init.sh,dist/env-init.sh.sha256
