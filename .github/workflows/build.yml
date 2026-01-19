@@ -32,19 +32,13 @@ jobs:
           git tag -f $VERSION
           git push origin $VERSION --force
 
-      - name: Create Release
+      - name: Create Release & Upload files
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.VERSION }}
           name: "env-init ${{ env.VERSION }}"
           draft: false
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload dist files
-        uses: softprops/action-gh-release@v1
-        with:
           files: dist/env-init.sh,dist/env-init.sh.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
