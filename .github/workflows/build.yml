@@ -1,17 +1,36 @@
-name: build
+name: Build & Release
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build-release:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
-      - run: chmod +x build.sh
-      - run: ./build.sh
-      - uses: actions/upload-artifact@v4
+
+      - name: Set execute permission for build script
+        run: chmod +x build.sh
+
+      - name: Run build
+        run: ./build.sh
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
         with:
-          name: env-init
-          path: dist/
+          tag_name: v${{ github.run_number }}
+          name: "env-init v${{ github.run_number }}"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload dist files to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/env-init.sh,dist/env-init.sh.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
