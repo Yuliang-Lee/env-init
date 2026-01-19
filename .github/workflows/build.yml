@@ -1,0 +1,17 @@
+name: build
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: chmod +x build.sh
+      - run: ./build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: env-init
+          path: dist/
