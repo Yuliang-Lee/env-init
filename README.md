@@ -22,4 +22,4 @@ curl -fsSL https://github.com/Yuliang-Lee/env-init/releases/latest/download/env-
 
 ## License
 
-[MIT](LICENSE) © [Yuliang Lee](https://github.com/Yuliang-Lee)
+[MIT](LICENSE)
