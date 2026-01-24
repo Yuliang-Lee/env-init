@@ -1,6 +1,6 @@
 # env-init
 
-One-command development environment bootstrap for macOS / Linux.
+One-command development environment bootstrap for macOS / Linux(Ubuntu/CentOS).
 
 ## Quick start
 
@@ -19,3 +19,7 @@ curl -fsSL https://github.com/Yuliang-Lee/env-init/releases/latest/download/env-
 ```bash
 ./build.sh
 ```
+
+## License
+
+[MIT](LICENSE) © [Yuliang Lee](https://github.com/Yuliang-Lee)
