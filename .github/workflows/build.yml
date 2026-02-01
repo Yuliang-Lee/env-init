@@ -12,20 +12,45 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check if only README changed
+        id: check_changes
+        run: |
+          # Get list of changed files in the last commit
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          
+          # Check if only README files were changed
+          NON_README_CHANGES=$(echo "$CHANGED_FILES" | grep -v -E '^README\.md$|^README\..*\.md$' || true)
+          
+          if [ -z "$NON_README_CHANGES" ] && [ -n "$CHANGED_FILES" ]; then
+            echo "Only README files changed, skipping build"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "Code changes detected, proceeding with build"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Set execute permission for build
+        if: steps.check_changes.outputs.skip != 'true'
         run: chmod +x build.sh
 
       - name: Read VERSION from config.sh
+        if: steps.check_changes.outputs.skip != 'true'
         id: version
         run: |
           VERSION=$(grep VERSION config.sh | cut -d'=' -f2 | tr -d '"')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Build
+        if: steps.check_changes.outputs.skip != 'true'
         run: ./build.sh
 
       - name: Create Git tag
+        if: steps.check_changes.outputs.skip != 'true'
         run: |
           git config user.name "xlaoyu"
           git config user.email "frank_yll@163.com"
@@ -33,6 +58,7 @@ jobs:
           git push origin $VERSION --force
 
       - name: Create Release & Upload files
+        if: steps.check_changes.outputs.skip != 'true'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.VERSION }}
